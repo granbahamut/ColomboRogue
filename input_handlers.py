@@ -32,6 +32,6 @@ def handle_keys(key):
         return {'fullscreen': True}
     # Exit the game
     elif key.vk == libtcod.KEY_ESCAPE:
-        return {'exit': True}
+        return {'exit_app': True}
     # no key pressed
     return {}

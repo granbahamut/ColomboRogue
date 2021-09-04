@@ -33,6 +33,9 @@ def main():
     screen_height = 32
     map_width = 120
     map_height = 32
+    room_max_size = 10
+    room_min_size = 4
+    max_rooms = 10
     screen_title = "My first Roguelike!"
 
     colors = {
@@ -51,7 +54,7 @@ def main():
     con = libtcod.console_new(screen_width, screen_height)
     # Create the map
     game_map = GameMap(map_width, map_height)
-    game_map.create_map()
+    game_map.create_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -66,7 +69,7 @@ def main():
         action = handle_keys(key)
 
         move = action.get('move')
-        exit = action.get('exit')
+        exit_app = action.get('exit_app')
         fullscreen = action.get('fullscreen')
         # Captured events:
         if move:
@@ -74,7 +77,7 @@ def main():
             if not game_map.is_blocked(player.x + dx, player.y + dy):
                 player.move(dx, dy)
 
-        if exit:
+        if exit_app:
             return True
 
         if fullscreen:

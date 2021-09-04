@@ -7,6 +7,7 @@ Email:          ivan.dario.pinilla@gmail.com
 License:        Apache license 2.0
 Version:        0.0.1
 """
+from random import randint
 from map_objects.room import Room
 from map_objects.tile import Tile
 
@@ -31,17 +32,55 @@ class GameMap:
 
         return tiles
 
-    def create_map(self):
+    def create_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
         """Creates the map with all of its components
 
+        :param max_rooms: (int) Maximum number of rooms in this dungeon.
+        :param room_min_size: (int) Minimum room size.
+        :param room_max_size: (int) Maximum room size.
+        :param map_width: (int) Map width.
+        :param map_height: (int) Map height.
+        :param player: (Entity) Player to be put onto the map.
         """
-        room1 = Room(20, 15, 10, 15)
-        room2 = Room(35, 15, 10, 15)
+        rooms = []
+        num_rooms = 0
+        # We create every room with a set of random sizes and random positions:
+        for r in range(max_rooms):
+            w = randint(room_min_size, room_max_size)
+            h = randint(room_min_size, room_max_size)
+            x = randint(0, map_width - w - 1)
+            y = randint(0, map_height - h - 1)
+            # We create a room with the previous created variables and then check if is a valid room among the others
+            # if not, we create a new one.
+            new_room = Room(x, y, w, h)
 
-        self.create_room(room1)
-        self.create_room(room2)
+            for other_room in rooms:
+                # Invalid room
+                if new_room.intersect(other_room):
+                    break
+            else:
+                # Valid room
+                self.create_room(new_room)
+                (new_x, new_y) = new_room.center()
 
-        self.create_hor_tunnel(25, 40, 23)
+                if num_rooms == 0:
+                    # First room where we add the player
+                    player.x = new_x
+                    player.y = new_y
+                else:
+                    # Other rooms goes like this: we go from horizontal to vertical o viceversa to connect them with
+                    # a tunnel
+                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+                    if randint(0, 1) == 1:
+                        self.create_hor_tunnel(prev_x, new_x, prev_y)
+                        self.create_ver_tunnel(prev_y, new_y, prev_x)
+                    else:
+                        self.create_ver_tunnel(prev_y, new_y, prev_x)
+                        self.create_hor_tunnel(prev_x, new_x, prev_y)
+
+                # Finally, add the room to the array
+                rooms.append(new_room)
+                num_rooms += 1
 
     def create_room(self, room):
         """Creates a room based on a rectangular shape given by the room argument.
