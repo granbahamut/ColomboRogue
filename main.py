@@ -13,6 +13,7 @@ import os
 
 import tcod as libtcod
 from entity import Entity
+from game_map import GameMap
 from input_handlers import handle_keys
 from render_functions import render_all, clear_all
 
@@ -30,9 +31,15 @@ def main():
     # Screen size
     screen_width = 120
     screen_height = 32
-    map_width = 80
-    map_height = 45
+    map_width = 120
+    map_height = 32
     screen_title = "My first Roguelike!"
+
+    colors = {
+        'dark_wall': libtcod.Color(0, 0, 100),
+        'dark_ground': libtcod.Color(50, 50, 150)
+    }
+
     # Player coordinates on the map ,and the npc's
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.yellow)
@@ -42,6 +49,9 @@ def main():
     libtcod.console_init_root(screen_width, screen_height, screen_title, False)
     # Add the console to a variable
     con = libtcod.console_new(screen_width, screen_height)
+    # Create the map
+    game_map = GameMap(map_width, map_height)
+    game_map.create_map()
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -49,7 +59,7 @@ def main():
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
         # Renders and then clears the screen, double buffering applied!
-        render_all(con, entities, screen_width, screen_height)
+        render_all(con, entities, game_map, screen_width, screen_height, colors)
         libtcod.console_flush()
         clear_all(con, entities)
         # Capture each event to determine the action to follow
@@ -61,7 +71,8 @@ def main():
         # Captured events:
         if move:
             dx, dy = move
-            player.move(dx, dy)
+            if not game_map.is_blocked(player.x + dx, player.y + dy):
+                player.move(dx, dy)
 
         if exit:
             return True

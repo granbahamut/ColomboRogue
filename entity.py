@@ -10,7 +10,7 @@ Version:        0.0.1
 
 
 class Entity:
-    """Init method"""
+    """Init method for an entity"""
     def __init__(self, x, y, char, color):
         self.x = x
         self.y = y

@@ -1,6 +1,6 @@
 """
 Name:           tile.py
-Author:         
+Author:         granbahamut
 Date:           3/09/2021 10:56 p. m.
 Description:    This script contains the base definition of a Tile object
 Email:          ivan.dario.pinilla@gmail.com
